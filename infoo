@@ -17,7 +17,7 @@ function numfo {
  clear	
  banner   
  read -p "phoneNumber = "  phoneNumber
- read -p "Your Api key = "
+ read -p "Your Api key = " API_KEY
  response=$(curl -s -H "apikey: $API_KEY" "https://api.apilayer.com/number_verification/validate?number=$phoneNumber")
  valid=$(echo "$response" | jq -r '.valid')
  type=$(echo "$response" | jq -r '.type') 
@@ -65,8 +65,8 @@ done
 function ip_locate {
 clear 
 banner
-API_KEY="JWjzfLzDU9xBnt8cF0PyCpsrlopQIuGZ"
-IP_ADDRESS="124.253.35.36"
+read -p "API-KEY :- " API_KEY
+read -p "IP-ADDRESS :- " IP_ADDRESS
 API_URL="https://api.apilayer.com/ip_to_location"
 response=$(curl -s "$API_URL?api_key=$API_KEY&ip=$IP_ADDRESS")
 country=$(echo "$response" | jq -r '.country')
