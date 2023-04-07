@@ -1,31 +1,38 @@
 #!/bin/bash
 
-function banner {
-toilet -f pagga Infoo | lolcat 
-}
+# Color codes
+RED="\033[1;31m"
+GREEN="\033[1;32m"
+WHITE="\033[1;37m"
+sudo apt install toilet lolcat
 
+
+# Function to display main menu
 function main_menu {
   clear
-  banner
+  toilet -F border  Infoo | lolcat 
   echo ""
   echo -e "$GREEN[${RED}1$GREEN]${WHITE} NUMBER INFO "
   echo -e "$GREEN[${RED}2$GREEN]${WHITE} IP to Location"
   echo -e "$GREEN[${RED}3$GREEN]${WHITE} TRY your luck* "
   echo -e "$GREEN[${RED}4$GREEN]${WHITE} Quit"
 }
+
+# Function to get number information
 function numfo {
- clear	
- banner   
- read -p "phoneNumber = "  phoneNumber
- read -p "Your Api key = " API_KEY
- response=$(curl -s -H "apikey: $API_KEY" "https://api.apilayer.com/number_verification/validate?number=$phoneNumber")
- valid=$(echo "$response" | jq -r '.valid')
- type=$(echo "$response" | jq -r '.type') 
- name=$(echo "$response" | jq -r '.name')
- location=$(echo "$response" | jq -r '.location')
- carrier=$(echo "$response" | jq -r '.carrier')
- lineType=$(echo "$response" | jq -r '.line_type')
-if [ "$valid" == "true" ]; then
+  clear
+  toilet -F border  Infoo | lolcat
+  echo -e "${GREEN}=================== NUMBER INFO ===================${WHITE}"
+  read -p "Enter phone number: "  phoneNumber
+  read -p "Enter your API key: " API_KEY
+  response=$(curl -s -H "apikey: $API_KEY" "https://api.apilayer.com/number_verification/validate?number=$phoneNumber")
+  valid=$(echo "$response" | jq -r '.valid')
+  type=$(echo "$response" | jq -r '.type')
+  name=$(echo "$response" | jq -r '.name')
+  location=$(echo "$response" | jq -r '.location')
+  carrier=$(echo "$response" | jq -r '.carrier')
+  lineType=$(echo "$response" | jq -r '.line_type')
+  if [ "$valid" == "true" ]; then
     echo "Number: $phoneNumber"
     echo "Valid: $valid"
     echo "Type: $type"
@@ -33,55 +40,63 @@ if [ "$valid" == "true" ]; then
     echo "Location: $location"
     echo "Carrier: $carrier"
     echo "Line Type: $lineType"
-else
+  else
     echo "No information found for $phoneNumber"
-read -p "Press Enter to continue..."
-fi
+    read -p "Press Enter to continue..."
+  fi
 }
-function genrate_API	{
-clear 
-banner	
-KEY_LENGTH=32
-api_urls=(
+
+# Function to generate API key
+function Generate_API {
+  clear
+  toilet -F border  Infoo | lolcat
+  echo -e "${GREEN}=================== GENERATE API KEY ===================${WHITE}"
+  KEY_LENGTH=32
+  api_urls=(
     "https://api.apilayer.com/number_verification/validate?number=14158586273&apikey="
     "https://api.apilayer.com/some_other_api?apikey="
-)
-api_key=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w "$KEY_LENGTH" | head -n 1)
-for url in "${api_urls[@]}"; do
+  )
+  api_key=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w "$KEY_LENGTH" | head -n 1)
+  for url in "${api_urls[@]}"; do
     full_url="$url$api_key"
     echo "Checking $full_url..."
     response=$(curl -s -o /dev/null -w "%{http_code}" "$full_url")
     if [ "$response" == "200" ]; then
-        echo "Status: API is online"
+      echo "Status: API is online"
     else
-        echo "Status: API is offline (HTTP response code $response)"
+      echo "Status: API is offline (HTTP response code $response)"
     fi
     echo
-read -p "Press Enter to continue..."
-done
 
+  done
+  read -p "Press Enter to continue..."
 }
 
+# Function to get IP location
 function ip_locate {
-clear 
-banner
-read -p "API-KEY :- " API_KEY
-read -p "IP-ADDRESS :- " IP_ADDRESS
-API_URL="https://api.apilayer.com/ip_to_location"
-response=$(curl -s "$API_URL?api_key=$API_KEY&ip=$IP_ADDRESS")
-country=$(echo "$response" | jq -r '.country')
-city=$(echo "$response" | jq -r '.city')
-region=$(echo "$response" | jq -r '.region')
-latitude=$(echo "$response" | jq -r '.latitude')
-longitude=$(echo "$response" | jq -r '.longitude')
-echo "IP Address: $IP_ADDRESS"
-echo "Country: $country"
-echo "City: $city"
-echo "Region: $region"
-echo "Latitude: $latitude"
-echo "Longitude: $longitude"
+  clear
+  toilet -F border  Infoo | lolcat
+  echo -e "${GREEN}=================== IP TO LOCATION ===================${WHITE}"
+  read -p "Enter an IP address: " ip_address
+  response=$(curl -s "http://ip-api.com/json/$ip_address")
+  status=$(echo "$response" | jq -r '.status')
+  if [ "$status" == "fail" ]; then
+    echo "Failed to fetch IP information. Please check your input IP address or website availability."
+     else 
+     country=$(echo "$response" | jq -r '.country')
+    region=$(echo "$response" | jq -r '.regionName')
+    city=$(echo "$response" | jq -r '.city')
+    lat=$(echo "$response" | jq -r '.lat')
+    lon=$(echo "$response" | jq -r '.lon')
 
-read -p "Press Enter to continue..."
+    echo "IP Address: $ip_address"
+    echo "Country: $country"
+    echo "Region: $region"
+    echo "City: $city"
+    echo "Latitude: $lat"
+    echo "Longitude: $lon"
+fi
+
 }
 # main system
 main_menu 
@@ -94,7 +109,7 @@ read -p "=> " choice
       ip_locate
       ;;
     3)
-       genrate_API 
+       Generate_API 
       ;;
    4)
       echo "Goodbye!"
@@ -104,4 +119,5 @@ read -p "=> " choice
       echo "Invalid choice. Please try again."
       ;;
   esac
+
 
